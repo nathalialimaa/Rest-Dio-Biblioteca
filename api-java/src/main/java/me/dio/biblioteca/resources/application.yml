@@ -1,0 +1,20 @@
+spring:
+  profiles:
+    active: ${APP_PROFILE}
+  application:
+    name: api-java
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres2
+    username: postgres
+    password: nathy1125 # Substitua pela senha REAL que você definiu para o usuário postgres
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect # Adicione o dialeto do PostgreSQL
+        jdbc:
+          lob:
+            non_contextual_creation: true
+server:
+  port: 8080

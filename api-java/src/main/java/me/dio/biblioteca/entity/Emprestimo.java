@@ -3,14 +3,12 @@ package me.dio.biblioteca.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import me.dio.biblioteca.enums.StatusEmprestimo;
-import java.time.LocalDate;
-import lombok.Builder;
-import lombok.Data;
 
-@Data 
-@Entity(name = "tb_emprestimo")
-@Getter
-@Setter
+import java.time.LocalDate;
+
+@Entity
+@Table(name = "tb_emprestimo")
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -31,13 +29,11 @@ public class Emprestimo {
     @Column(name = "data_emprestimo", nullable = false)
     private LocalDate dataEmprestimo;
 
-    @Column(name = "data_devolucao_prevista", nullable = false)
-    private LocalDate dataDevolucaoPrevista;
 
-    @Column(name = "data_devolucao_real")
+    @Column(name = "data_devolucao", nullable = false )
     private LocalDate dataDevolucaoReal;
 
-    @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private StatusEmprestimo status;
 }
