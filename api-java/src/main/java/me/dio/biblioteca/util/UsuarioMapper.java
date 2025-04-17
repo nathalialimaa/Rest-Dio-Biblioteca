@@ -1,4 +1,4 @@
-package me.dio.biblioteca.util;
+package me.dio.biblioteca.mapper;
 
 import me.dio.biblioteca.dto.UsuarioDTO;
 import me.dio.biblioteca.entity.Usuario;
@@ -11,17 +11,10 @@ public class UsuarioMapper {
         return Usuario.builder()
                 .nome(dto.nome())
                 .cpf(dto.cpf())
-                .telefone(dto.telefone())
-                .email(dto.email())
                 .build();
     }
 
-    public UsuarioDTO toDto(Usuario entity) {
-        return UsuarioDTO.builder()
-                .nome(entity.getNome())
-                .cpf(entity.getCpf())
-                .telefone(entity.getTelefone())
-                .email(entity.getEmail())
-                .build();
+    public UsuarioDTO toDto(Usuario usuario) {
+        return new UsuarioDTO(usuario.getNome(), usuario.getCpf());
     }
 }

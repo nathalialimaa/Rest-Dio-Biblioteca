@@ -1,43 +1,41 @@
 package me.dio.biblioteca.service.impl;
-import me.dio.biblioteca.service.EmprestimoService;
-import me.dio.biblioteca.entity.Emprestimo;
-import me.dio.biblioteca.repository.EmprestimoRepository;
-import org.springframework.stereotype.Service;
-import me.dio.biblioteca.dto.EmprestimoDTO;
+
 import lombok.RequiredArgsConstructor;
-
-
+import me.dio.biblioteca.dto.EmprestimoDTO;
+import me.dio.biblioteca.entity.Emprestimo;
+import me.dio.biblioteca.entity.Livro;
+import me.dio.biblioteca.entity.Usuario;
+import me.dio.biblioteca.enums.StatusEmprestimo;
+import me.dio.biblioteca.mapper.EmprestimoMapper;
+import me.dio.biblioteca.repository.EmprestimoRepository;
+import me.dio.biblioteca.repository.LivroRepository;
+import me.dio.biblioteca.repository.UsuarioRepository;
+import me.dio.biblioteca.service.EmprestimoService;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class EmprestimoServiceImpl implements EmprestimoService {
 
     private final EmprestimoRepository emprestimoRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final LivroRepository livroRepository;
     private final EmprestimoMapper emprestimoMapper;
 
-    public EmprestimoServiceImpl(EmprestimoRepository emprestimoRepository, EmprestimoMapper emprestimoMapper) {
-        this.emprestimoRepository = emprestimoRepository;
-        this.emprestimoMapper = emprestimoMapper;
-    }
+    @Override
+    public Emprestimo saveEmprestimo(EmprestimoDTO dto) {
+        Usuario usuario = usuarioRepository.findById(dto.usuarioId())
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
 
-    public Emprestimo salvarEmprestimo(EmprestimoDTO emprestimoRequest) {
-        // Aqui você pode adicionar validações como: livro disponível, usuário com limite de empréstimos, etc.
+        Livro livro = livroRepository.findById(dto.livroId())
+                .orElseThrow(() -> new IllegalArgumentException("Livro não encontrado"));
 
-        return emprestimoRepository.save(
-                emprestimoMapper.toEntity(emprestimoRequest));
-    }
+        boolean livroJaEmprestado = emprestimoRepository.existsByLivroAndStatus(livro, StatusEmprestimo.ATIVO);
+        if (livroJaEmprestado) {
+            throw new IllegalStateException("Livro já está emprestado");
+        }
 
-    public EmprestimoDTO buscarEmprestimoPorId(Long id) {
-        return emprestimoMapper.toDto(
-                emprestimoRepository.findById(id)
-                        .orElseThrow(() -> new RuntimeException("Empréstimo não encontrado")));
-    }
-
-    public List<EmprestimoDTO> listarTodosEmprestimos() {
-        return emprestimoRepository.findAll().stream()
-                .map(emprestimoMapper::toDto)
-                .collect(Collectors.toList());
+        Emprestimo emprestimo = emprestimoMapper.toEntity(dto, usuario, livro);
+        return emprestimoRepository.save(emprestimo);
     }
 }
